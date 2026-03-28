@@ -1,14 +1,4 @@
-import React from "react";
-import "./style.css";
-
-export default function App() {
-  return (
-    <div>
-      <h1>Hello StackBlitz!</h1>
-      <p>Start editing to see some magic happen :)</p>
-    </div>
-  );
-}
+/* eslint-disable */
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Calendar, 
@@ -30,10 +20,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  HelpCircle,
-  Monitor,
-  Smartphone,
-  Download,
   Users,
   LogOut,
   ArrowRight,
@@ -79,6 +65,7 @@ const getSafeRecentClients = () => {
     const item = localStorage.getItem('agrimanage_recents');
     return item ? JSON.parse(item) : [];
   } catch (error) {
+    console.error(error);
     return [];
   }
 };
@@ -86,7 +73,9 @@ const getSafeRecentClients = () => {
 const saveSafeRecentClients = (clients) => {
   try {
     localStorage.setItem('agrimanage_recents', JSON.stringify(clients));
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export default function App() {
@@ -255,12 +244,12 @@ export default function App() {
     const newRecents = [ {name: name.trim(), slug, lastUpdated: existingLastUpdated}, ...filteredRecents ].slice(0, 15);
     saveSafeRecentClients(newRecents);
     setRecentClients(newRecents);
-    try { localStorage.setItem('agrimanage_current_client', slug); } catch(e) {}
+    try { localStorage.setItem('agrimanage_current_client', slug); } catch(e) { console.error(e); }
     setClientId(slug);
   };
 
   const handleSwitchClient = () => {
-    try { localStorage.removeItem('agrimanage_current_client'); } catch(e) {}
+    try { localStorage.removeItem('agrimanage_current_client'); } catch(e) { console.error(e); }
     setClientId('');
     setTasks([]);
   };
@@ -283,7 +272,7 @@ export default function App() {
       });
       saveSafeRecentClients(newRecents);
       setRecentClients(newRecents);
-      try { localStorage.removeItem(`agrimanage_tasks_${clientSlug}`); } catch(e) {}
+      try { localStorage.removeItem(`agrimanage_tasks_${clientSlug}`); } catch(e) { console.error(e); }
     }
   };
 
@@ -301,7 +290,7 @@ export default function App() {
       try {
         localStorage.removeItem(`agrimanage_tasks_${clientId}`);
         localStorage.removeItem('agrimanage_current_client');
-      } catch(e) {}
+      } catch(e) { console.error(e); }
       setClientId('');
       setTasks([]);
     }
@@ -364,7 +353,7 @@ export default function App() {
             syncTasksToStorage(importedTasks);
           }
         } else alert("El archivo no tiene el formato correcto.");
-      } catch (err) { alert("Error al leer el archivo de respaldo."); }
+      } catch (err) { console.error(err); alert("Error al leer el archivo de respaldo."); }
       if(fileInputRef.current) fileInputRef.current.value = '';
     };
     reader.readAsText(file);
@@ -802,7 +791,7 @@ function TaskList({ tasks, onEdit, onDelete, onViewCows, onComplete }) {
                   </td>
                   <td className="p-4 align-top">
                     <div className="flex items-center space-x-2 w-32">
-                      <div className="w-full bg-slate-200 rounded-full h-2.5"><div className={`h-2.5 rounded-full ${task.progress == 100 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${task.progress}%` }}></div></div>
+                      <div className="w-full bg-slate-200 rounded-full h-2.5"><div className={`h-2.5 rounded-full ${task.progress === 100 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${task.progress}%` }}></div></div>
                       <span className="text-sm font-medium text-slate-700">{task.progress}%</span>
                     </div>
                     {task.quality && (
@@ -996,6 +985,7 @@ function TaskFormModal({ task, existingTasks, onSave, onClose }) {
           <form id="taskForm" onSubmit={handleSubmit} className="space-y-4">
             <div><label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Actividad *</label><input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none transition-all" /></div>
             <div>
+            
               <div className="flex justify-between items-end mb-1">
                 <label className="block text-sm font-medium text-slate-700">Lista de Vacas</label>
                 {existingTasks && existingTasks.length > 0 && (
